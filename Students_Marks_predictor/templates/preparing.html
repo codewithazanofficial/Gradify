@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card">
+  <h1 class="card-title">Gradify is reviewing your day ✨</h1>
+  {% if name %}
+    <p class="card-subtitle">
+      Hi {{ name }}, I've gone through your lifestyle data. Let me talk you through what it
+      really means for your studies.
+    </p>
+  {% else %}
+    <p class="card-subtitle">
+      I've gone through your lifestyle data. Let me talk you through what it really means
+      for your studies.
+    </p>
+  {% endif %}
+
+  <div class="advice-section">
+    <h2>Heres what I noticed</h2>
+    <ul class="advice-list" id="advice-list">
+      {% for sentence in advice_sentences %}
+        <li class="advice-line">{{ sentence }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="qa-section">
+    <p class="qa-subtitle">
+      Ill also walk you through this out loud (if your browser supports it). You can replay
+      the voice or continue to your dashboard whenever youre ready.
+    </p>
+    <div class="form-actions full-width">
+      <button type="button" class="btn-secondary" id="replay-voice">Replay voice</button>
+      <form method="post" action="{{ url_for('dashboard') }}" style="display:inline;">
+        <input type="hidden" name="name" value="{{ name or '' }}" />
+        <input type="hidden" name="predicted_gpa" value="{{ predicted_gpa }}" />
+        <input type="hidden" name="adjusted_gpa" value="{{ adjusted_gpa }}" />
+        <input type="hidden" name="study_hours" value="{{ study_hours }}" />
+        <input type="hidden" name="eca_hours" value="{{ eca_hours }}" />
+        <input type="hidden" name="sleep_hours" value="{{ sleep_hours }}" />
+        <input type="hidden" name="social_hours" value="{{ social_hours }}" />
+        <input type="hidden" name="physical_hours" value="{{ physical_hours }}" />
+        <input type="hidden" name="user_text" value="{{ user_text }}" />
+        <button type="submit" class="btn-primary">Continue to dashboard</button>
+      </form>
+    </div>
+    <p id="voice-status" class="qa-subtitle" style="margin-top:0.6rem; font-size:0.8rem;"></p>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const sentences = {{ advice_sentences|tojson|safe }};
+
+    function chooseVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return null;
+
+      // Prefer an English, natural-sounding female voice if available
+      const preferred = voices.find(v => /en/i.test(v.lang) && /female|woman|zira|aria|susan/i.test(v.name));
+      if (preferred) return preferred;
+
+      const english = voices.find(v => /en/i.test(v.lang));
+      if (english) return english;
+
+      return voices[0];
+    }
+
+    function speakSentences() {
+      const status = document.getElementById('voice-status');
+      if (!('speechSynthesis' in window)) {
+        if (status) {
+          status.textContent = "Your browser doesn't support voice playback, but you can read the advice above.";
+        }
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const voice = chooseVoice();
+      sentences.forEach(text => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (voice) utterance.voice = voice;
+        utterance.rate = 1.02;
+        utterance.pitch = 1.05;
+        utterance.volume = 1.0;
+        window.speechSynthesis.speak(utterance);
+      });
+
+      if (status) {
+        status.textContent = voice
+          ? `Speaking with voice: ${voice.name}`
+          : 'Speaking advice using your default browser voice.';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if ('speechSynthesis' in window) {
+        // Some browsers load voices asynchronously
+        window.speechSynthesis.onvoiceschanged = function () {
+          speakSentences();
+        };
+        // Fallback in case onvoiceschanged doesn't fire
+        setTimeout(speakSentences, 400);
+      }
+
+      const replay = document.getElementById('replay-voice');
+      if (replay) {
+        replay.addEventListener('click', () => {
+          speakSentences();
+        });
+      }
+    });
+  })();
+</script>
+{% endblock %}

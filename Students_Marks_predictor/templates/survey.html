@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card">
+  <h1 class="card-title">Student Lifestyle Survey</h1>
+  <p class="card-subtitle">
+    Answer a few quick questions about your daily routine and Gradify will
+    estimate your expected GPA and give you honest, actionable feedback.
+  </p>
+
+  <form method="post" action="{{ url_for('predict') }}" class="form-grid">
+    <div class="form-field full-width">
+      <label for="name">Your name (optional)</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        placeholder="Alex"
+        value="{{ name or '' }}"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="study_hours">Study hours per day</label>
+      <input
+        type="number"
+        id="study_hours"
+        name="study_hours"
+        min="0"
+        max="24"
+        step="0.1"
+        required
+        value="{{ study_hours or '' }}"
+      />
+      <small>Includes focused study and revision time.</small>
+    </div>
+
+    <div class="form-field">
+      <label for="eca_hours">Extracurricular hours per day</label>
+      <input
+        type="number"
+        id="eca_hours"
+        name="eca_hours"
+        min="0"
+        max="24"
+        step="0.1"
+        required
+        value="{{ eca_hours or '' }}"
+      />
+      <small>Clubs, competitions, creative hobbies, etc.</small>
+    </div>
+
+    <div class="form-field">
+      <label for="sleep_hours">Sleep hours per night</label>
+      <input
+        type="number"
+        id="sleep_hours"
+        name="sleep_hours"
+        min="0"
+        max="24"
+        step="0.1"
+        required
+        value="{{ sleep_hours or '' }}"
+      />
+      <small>Average hours of sleep on a typical night.</small>
+    </div>
+
+    <div class="form-field">
+      <label for="social_hours">Social / online hours per day</label>
+      <input
+        type="number"
+        id="social_hours"
+        name="social_hours"
+        min="0"
+        max="24"
+        step="0.1"
+        required
+        value="{{ social_hours or '' }}"
+      />
+      <small>Talking with friends or being socially active online.</small>
+    </div>
+
+    <div class="form-field">
+      <label for="physical_hours">Physical activity hours per day</label>
+      <input
+        type="number"
+        id="physical_hours"
+        name="physical_hours"
+        min="0"
+        max="24"
+        step="0.1"
+        required
+        value="{{ physical_hours or '' }}"
+      />
+      <small>Workout, sports, or any movement-focused activity.</small>
+    </div>
+
+    <div class="form-field full-width">
+      <label for="user_text">How do you feel about studying this subject?</label>
+      <textarea
+        id="user_text"
+        name="user_text"
+        rows="4"
+        placeholder="Be honest — 2–5 lines about your interest, motivation, or struggles."
+      >{{ user_text or '' }}</textarea>
+    </div>
+
+    <div class="form-actions full-width">
+      <button type="submit" class="btn-primary">Predict my GPA & insights</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

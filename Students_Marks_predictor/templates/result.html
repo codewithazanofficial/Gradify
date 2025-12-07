@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card">
+  <h1 class="card-title">Your Gradify insights</h1>
+  {% if name %}
+    <p class="card-subtitle">Hi {{ name }}, here is how your current routine translates into performance.</p>
+  {% else %}
+    <p class="card-subtitle">Here is how your current routine translates into performance.</p>
+  {% endif %}
+
+  <div class="results-grid">
+    <div class="result-box">
+      <h2>Predicted GPA</h2>
+      <p class="gpa gpa-adjusted">{{ '%.2f'|format(adjusted_gpa) }}</p>
+      <p class="result-note">This is Gradify's final prediction based on your routine and how you feel about studying.</p>
+    </div>
+  </div>
+
+  {% if advice_sentences and advice_sentences|length > 0 %}
+    <div class="advice-section">
+      <h2>Gradify's honest feedback</h2>
+      <ul class="advice-list">
+        {% for sentence in advice_sentences %}
+          <li>{{ sentence }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if followup_answers and followup_answers|length > 0 %}
+    <div class="advice-section">
+      <h2>Follow-up answer</h2>
+      {% if followup_question %}
+        <p class="question-label">Your question:</p>
+        <p class="question-text">{{ followup_question }}</p>
+      {% endif %}
+      <ul class="advice-list">
+        {% for sentence in followup_answers %}
+          <li>{{ sentence }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="qa-section">
+    <h2>Ask Gradify a follow-up question</h2>
+    <p class="qa-subtitle">
+      You can ask about your study plan, time management, or how to improve this GPA.
+    </p>
+    <form method="post" action="{{ url_for('ask') }}" class="form-grid">
+      <div class="form-field full-width">
+        <label for="question">Your question</label>
+        <textarea
+          id="question"
+          name="question"
+          rows="3"
+          placeholder="Example: What should I change first if I want to move closer to a 3.5 GPA?"
+        ></textarea>
+      </div>
+
+      {# Context fields to rebuild user_data and GPA on the server #}
+      <input type="hidden" name="name" value="{{ name or '' }}" />
+      <input type="hidden" name="predicted_gpa" value="{{ predicted_gpa }}" />
+      <input type="hidden" name="adjusted_gpa" value="{{ adjusted_gpa }}" />
+      <input type="hidden" name="study_hours" value="{{ study_hours }}" />
+      <input type="hidden" name="eca_hours" value="{{ eca_hours }}" />
+      <input type="hidden" name="sleep_hours" value="{{ sleep_hours }}" />
+      <input type="hidden" name="social_hours" value="{{ social_hours }}" />
+      <input type="hidden" name="physical_hours" value="{{ physical_hours }}" />
+      <input type="hidden" name="user_text" value="{{ user_text }}" />
+
+      <div class="form-actions full-width">
+        <button type="submit" class="btn-secondary">Ask Gradify</button>
+        <a href="{{ url_for('survey_form') }}" class="btn-link">Start a new survey</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
