@@ -1,6 +1,4 @@
-
 import streamlit as st
-import anthropic
 import google.generativeai as genai
 st.set_page_config(initial_sidebar_state="collapsed",page_title="AI Study Assistant", layout="centered")
 st.markdown("""
