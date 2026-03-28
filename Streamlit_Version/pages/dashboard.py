@@ -5,8 +5,8 @@ if "switch_page" not in st.session_state:
     st.session_state.switch_page = False
 else:
     st.switch_page("frontend.py")
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(current_dir, "..", "model_pickle")
 
 st.set_page_config(initial_sidebar_state="collapsed",page_title="GRADIFY", layout="centered")
 from response import Response
