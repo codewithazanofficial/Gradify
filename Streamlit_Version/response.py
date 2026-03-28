@@ -1,4 +1,7 @@
-
+import nltk
+nltk.download('vader_lexicon', quiet=True)
+nltk.download('punkt', quiet=True)        # needed for sent_tokenize too
+nltk.download('punkt_tab', quiet=True)  
 import google.generativeai as genai
 
 # from dotenv import load_dotenv
@@ -9,7 +12,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 # Configure API key
 
 
-API_KEY = "AIzaSyDy8_YVH_fvHPDMxpQGRAUOigpEoEbzA_A" #st.secrets["GEMINI_API_KEY"]
+API_KEY = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=API_KEY)
 
 # Create the model
