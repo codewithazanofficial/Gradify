@@ -1,14 +1,15 @@
 
 import google.generativeai as genai
-import os
-from dotenv import load_dotenv
-import pyttsx3 as ts
+
+# from dotenv import load_dotenv
+# import pyttsx3 as ts
+import streamlit as st
 from nltk.tokenize import sent_tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 # Configure API key
-load_dotenv()
 
-API_KEY = os.getenv("GEMINI_API_KEY")
+
+API_KEY = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=API_KEY)
 
 # Create the model
@@ -60,16 +61,17 @@ class Response:
         return sentences
     @staticmethod
     def speak(response, voice = None, rate = 180, volume = 1.0):
-        engine = ts.init()
-        if voice:
-            voices = engine.getProperty('voices')
-            for i in voices:
-                if voice in i.id:
-                    engine.setProperty('voice',voice)
-        engine.setProperty('rate',rate)
-        engine.setProperty('volume',volume)
-        engine.say(response)
-        engine.runAndWait()
+        # engine = ts.init()
+        # if voice:
+        #     voices = engine.getProperty('voices')
+        #     for i in voices:
+        #         if voice in i.id:
+        #             engine.setProperty('voice',voice)
+        # engine.setProperty('rate',rate)
+        # engine.setProperty('volume',volume)
+        # engine.say(response)
+        # engine.runAndWait()
+        pass
 
     def adjust_gpa(self,user_text, predicted_gpa):
         analyzer = SentimentIntensityAnalyzer()
@@ -109,14 +111,14 @@ class Response:
 
 
 if __name__ == '__main__':
-    voices = ts.init().getProperty('voices')
+    # voices = ts.init().getProperty('voices')
     print("Initializing the engine.")
     import numpy as np
     user_data = {
         'user_data': np.array([[5.2, 6.5, 3.2, 3.6, 1.2]]),
         'user_text': "I love my subject and i am very passionate."
     }
-    Response.speak("Initializing the engine...",voices[1].id,170)
+    # Response.speak("Initializing the engine...",voices[1].id,170)
     # # Print the generated text
     # print("\nGenerated Advice:\n")
     a = Response(user_data)
