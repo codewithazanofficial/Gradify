@@ -5,3 +5,4 @@ scikit-learn
 matplotlib
 google-generativeai
 python-dotenv
+nltk
