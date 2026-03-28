@@ -1,26 +1,22 @@
 
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 import pyttsx3 as ts
 from nltk.tokenize import sent_tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+# Configure API key
+load_dotenv()
 
-# Configure API key (hardcoded for this project)
-genai.configure(api_key="AIzaSyDTfWI-6tHeQb8QV74XW3YwqrwvqoNhC4c")
+API_KEY = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=API_KEY)
 
 # Create the model
 model = genai.GenerativeModel("gemini-2.5-flash")
 
-
-def tokenize_sentences(text: str):
-    """Small helper to tokenize text into sentences.
-
-    Exposed as a function so web helpers can reuse the same behavior.
-    """
-    return sent_tokenize(text)
-
-
+# Example data (you’ll pass real data from your model)
 class Response:
-    def __init__(self, user_data):
+    def __init__(self,user_data):
         self.user_data = user_data['user_data'].ravel()
         self.study_hours = self.user_data[0]
         self.extracurricular_hours = self.user_data[1]
@@ -28,20 +24,13 @@ class Response:
         self.social_hours = self.user_data[3]
         self.physical_hours = self.user_data[4]
         self.user_text = user_data['user_text']
-
-    def generate_response(self, gpa):
-        """Generate advisory sentences for the student.
-
-        This method is defensive so that if the external Gemini API or NLTK
-        tokeniser fails, we still return a reasonable list of sentences instead
-        of crashing the web request.
-        """
+    def generate_response(self,gpa):
         self.gpa = gpa
         prompt = f"""
         You are Gradify, an analytical academic performance evaluator.
-
+        
         A student has submitted the following daily lifestyle data:
-
+        
         - Study Hours: {self.study_hours}
         - Extracurricular Hours: {self.extracurricular_hours}
         - Sleep Hours: {self.sleep_hours}
@@ -53,7 +42,7 @@ class Response:
         1. Analyze the numbers logically and directly — no unnecessary praise or emotion, honestly first state the gpa and a short comment about it.
         2. Comment straight forward and honestly on gpa.
         3. Identify any weak areas (e.g., too little sleep, excessive social time, low study hours).
-        4. For each weak habit, give a clear numeric suggestion for improvement (e.g., "Increase study time to 7–8 hours" or "Reduce social hours to below 2 per day").
+        4. For each weak habit, give a clear numeric suggestion for improvement (e.g., “Increase study time to 7–8 hours” or “Reduce social hours to below 2 per day”).
         5. Provide reasoning for each suggestion briefly and factually.
         6. Conclude with an estimated improvement in GPA if the recommendations are followed.
         7. Keep the total response under 8 sentences, concise and professional.
@@ -66,47 +55,26 @@ class Response:
         5. Consider that for social hours the best range is 1 to 2.5 hours per day so don't criticise if they are in this range but appriciate. If not in this range then criticise.
         6. 2. Consider that for physical hours the best range is 1 to 3 hours per day so don't criticise if they are in this range but appriciate. If not in this range then criticise.
         """
-
-        try:
-            gemini_response = model.generate_content(prompt)
-            text = getattr(gemini_response, "text", str(gemini_response))
-        except Exception:
-            # Fallback generic advice if the Gemini API is unavailable
-            return [
-                "I couldn't generate detailed advice right now due to a technical issue.",
-                "In general, aim for strong study hours, consistent sleep, and regular physical activity while keeping social and extracurricular time balanced.",
-            ]
-
-        try:
-            sentences = tokenize_sentences(text)
-        except Exception:
-            # If tokenisation fails, just return the raw text as one sentence
-            return [text]
-
+        response = model.generate_content(prompt)
+        sentences = sent_tokenize(response.text)
         return sentences
-
     @staticmethod
-    def speak(response, voice=None, rate=180, volume=1.0):
+    def speak(response, voice = None, rate = 180, volume = 1.0):
         engine = ts.init()
         if voice:
             voices = engine.getProperty('voices')
             for i in voices:
                 if voice in i.id:
-                    engine.setProperty('voice', voice)
-        engine.setProperty('rate', rate)
-        engine.setProperty('volume', volume)
+                    engine.setProperty('voice',voice)
+        engine.setProperty('rate',rate)
+        engine.setProperty('volume',volume)
         engine.say(response)
         engine.runAndWait()
 
-    def adjust_gpa(self, user_text, predicted_gpa):
-        """Adjust GPA based on sentiment, but fail safe if NLTK resources are missing."""
-        try:
-            analyzer = SentimentIntensityAnalyzer()
-            ps = analyzer.polarity_scores(user_text or "")
-            return ps['compound'] * 0.4 + predicted_gpa
-        except Exception:
-            # If sentiment analysis is unavailable, just return the original GPA
-            return predicted_gpa
+    def adjust_gpa(self,user_text, predicted_gpa):
+        analyzer = SentimentIntensityAnalyzer()
+        ps = analyzer.polarity_scores(user_text)
+        return ps['compound'] * 0.4 + predicted_gpa
 
     def get_and_respond(self, text = ""):
         if text == "":
@@ -133,13 +101,13 @@ class Response:
         Only use the references of the above data in the response if user asks for or if needed. 
         """
         passage = model.generate_content(prompt)
-        sentences = tokenize_sentences(passage.text)
+        sentences = sent_tokenize(passage.text)
         for sentence in sentences:
             print(sentence)
             self.speak(sentence)
         self.get_and_respond()
 
-# a = Response(user_data,gpa=3.1)
+
 if __name__ == '__main__':
     voices = ts.init().getProperty('voices')
     print("Initializing the engine.")

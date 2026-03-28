@@ -14,7 +14,7 @@ def build_user_data(
 ) -> Dict[str, Any]:
     """Build the user_data dict expected by the model and Response class.
 
-    The numeric features are kept in the same order and shape as in survey.py
+    The numeric features are kept in the same order and shape as in chat.py
     and Model_training.ipynb.
     """
     features = np.array(
@@ -55,7 +55,7 @@ def predict_and_generate_response(model, user_data: Dict[str, Any]):
 
     Returns a tuple of (predicted_gpa, adjusted_gpa, advice_sentences).
     """
-    # model expects a 2D numpy array like in survey.py
+    # model expects a 2D numpy array like in chat.py
     predicted_gpa = float(model.predict(user_data["user_data"])[0])
 
     response = Response(user_data)

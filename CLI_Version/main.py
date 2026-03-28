@@ -3,8 +3,8 @@ import numpy as np
 import pickle
 from response import Response
 import pyttsx3 as ts
-from survey import survey
-from survey import show_loading
+from pages.chat import survey
+from pages.chat import show_loading
 class Bot:
     def __init__(self):
         with open('model_pickel', 'rb') as f:

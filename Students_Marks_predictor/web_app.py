@@ -12,8 +12,14 @@ from core import (
 
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("GRADIFY_FLASK_SECRET", "dev-secret-key")
-
+# Set a default secret key for session/flash support.
+# If FLASK_SECRET_KEY is provided in the environment, prefer that;
+# otherwise fall back to a safe development key.
+_env_secret = os.environ.get("FLASK_SECRET_KEY")
+if _env_secret:
+    app.secret_key = _env_secret
+else:
+    app.secret_key = os.environ.get("GRADIFY_FLASK_SECRET", "dev-secret-key")
 
 # Load the regression model once at startup
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "model_pickel")

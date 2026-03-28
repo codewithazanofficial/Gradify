@@ -4,7 +4,7 @@ import pyttsx3 as ts
 from nltk.tokenize import sent_tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 # Configure API key
-genai.configure(api_key="your_api_key")
+genai.configure(api_key="AIzaSyBks6Zr8N8CQCIi42UsVBtR_VCmoumpEfo")
 
 # Create the model
 model = genai.GenerativeModel("gemini-2.5-flash")
@@ -102,7 +102,7 @@ class Response:
             self.speak(sentence)
         self.get_and_respond()
 
-# a = Response(user_data,gpa=3.1)
+
 if __name__ == '__main__':
     voices = ts.init().getProperty('voices')
     print("Initializing the engine.")
