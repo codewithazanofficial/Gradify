@@ -5,13 +5,14 @@ if "switch_page" not in st.session_state:
     st.session_state.switch_page = False
 else:
     st.switch_page("frontend.py")
-current_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(current_dir, "..", "model_pickle")
 
 st.set_page_config(initial_sidebar_state="collapsed",page_title="GRADIFY", layout="centered")
 from response import Response
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-lr_model = pickle.load(open("model_pickle", "rb"))
+with open(os.path.join(BASE_DIR, 'model_pickle'), 'rb') as f:
+    lr_model = pickle.load(f)
+
 st.title("GRADIFY || Dashboard")
 if st.sidebar.button("AI ASSITANT"):
     st.switch_page('frontend.py')

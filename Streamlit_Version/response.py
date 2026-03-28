@@ -9,7 +9,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 # Configure API key
 
 
-API_KEY = st.secrets["GEMINI_API_KEY"]
+API_KEY = "AIzaSyDy8_YVH_fvHPDMxpQGRAUOigpEoEbzA_A" #st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=API_KEY)
 
 # Create the model

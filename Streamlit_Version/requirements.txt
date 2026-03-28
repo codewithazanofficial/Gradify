@@ -6,3 +6,5 @@ matplotlib
 google-generativeai
 python-dotenv
 nltk
+scikit-learn
+openpyxl
